@@ -20,7 +20,13 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/createConversation", "destination": "/conversation.json"
+      },
+      {
+        "source": "/disconnectURL", "destination": "/disconnect.json"
+      },
+      {
+        "source": "/",
         "destination": "/index.html"
       }
     ]

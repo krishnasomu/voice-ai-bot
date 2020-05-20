@@ -1,0 +1,6 @@
+{
+"activitiesURL": "activitiesURL",
+"refreshURL": "refreshURL",
+"disconnectURL": "disconnectURL",
+"expiresSeconds": 60
+}
