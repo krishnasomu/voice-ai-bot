@@ -1,10 +1,11 @@
 {
   "name": "voice-ai-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Voice AI bot",
   "main": "index.js",
   "dependencies": {
-    "rfc4122": "^1.0.6"
+    "rfc4122": "^1.0.6",
+    "uuid": "^8.0.0"
   },
   "devDependencies": {},
   "scripts": {
