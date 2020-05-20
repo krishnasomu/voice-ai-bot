@@ -20,10 +20,13 @@
     ],
     "rewrites": [
       {
-        "source": "/createConversation", "destination": "/conversation.json"
+        "source": "/createConversation", "function": "createConversation"
       },
       {
-        "source": "/disconnectURL", "destination": "/disconnect.json"
+        "source": "/disconnectURL", "function": "disconnectURL"
+      },
+      {
+        "source": "/activitiesURL", "function": "activitiesURL"
       },
       {
         "source": "/",

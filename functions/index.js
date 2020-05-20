@@ -1,28 +1,70 @@
 const functions = require('firebase-functions');
+const uuid = require('uuid');
+let ani = "";
+let dnis = "";
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
-});
+  exports.createConversation = functions.https.onRequest((request, response) => {
+    response.json({
+      "activitiesURL": "activitiesURL",
+      "refreshURL": "refreshURL",
+      "disconnectURL": "disconnectURL",
+      "expiresSeconds": 30
+      });
+  });
 
-exports.activitiesURL = functions.https.onRequest((request, response) => {
-    const RFC4122 = require('rfc4122');
-    response.send(rfc4122.v4());
-    //response.json(JSON.parse('{"activities": [{"id": "15b3d407-5161-41e7-8114-a273859c5f6d","timestamp": "2020-01-26T13:03:48.748Z","type": "message","text": "Hi there."}]}'));
-});
+  exports.disconnectURL = functions.https.onRequest((request, response) => {
+    response.json({});
+  });
 
-function uuid() {
-    var uuid = "", i, random;
-    for (i = 0; i < 32; i++) {
-      random = Math.random() * 16 | 0;
-  
-      if (i == 8 || i == 12 || i == 16 || i == 20) {
-        uuid += "-";
+  exports.activitiesURL = functions.https.onRequest((request, response) => {
+ 
+    try{
+      let reqActivitiesObj = request.body;
+      let reqActivityType = reqActivitiesObj.activities[0].type;
+
+      if(reqActivityType==="event"){
+        if(reqActivitiesObj.activities[0].name==="start"){
+          ani = "" + reqActivitiesObj.activities[0].parameters.caller;
+          dnis = "" + reqActivitiesObj.activities[0].parameters.callee;
+          console.log("ani:" + ani);
+          console.log("dnis:" + dnis);
+          response.json(JSON.parse(getActivitiesObj([['message','Hello ' + ani + '. Welcome to Kore.AI'],['message','Say something']])));
+        }
       }
-      uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
+      if(reqActivityType==="message"){
+        let messageText = reqActivitiesObj.activities[0].text.toLowerCase(); 
+        if(messageText==="bye"){
+          response.json(JSON.parse(getActivitiesObj([['message','Thanks for using Kore.AI bot'],['event','hangup']])));
+        }else{
+          response.json(JSON.parse(getActivitiesObj([['message','You said ' + messageText]])));
+        }
+      }
+    }catch(err){
+      response.send(err);
     }
-    return uuid;
-  }
-  
+});
+
+function getActivitiesObj(activities){
+  strActivitiesJSON = '{"activities":[';
+  activities.forEach(activity => {
+    let activityType = activity[0];
+    strActivitiesJSON += '{';
+    strActivitiesJSON += '"id":"' + uuid.v4() + '",';
+    strActivitiesJSON += '"timestamp":"' + new Date().toISOString() + '",';
+    strActivitiesJSON += '"type":"' + activityType + '",';
+    if(activityType==="message"){
+      strActivitiesJSON += '"text":"' + activity[1] + '"';
+      console.log("text:", activity[1]);
+    }else{
+      strActivitiesJSON += '"name":"' + activity[1] + '"';
+    }
+    strActivitiesJSON += '},';
+  });
+  strActivitiesJSON = strActivitiesJSON.substring(0, strActivitiesJSON.length - 1);
+  strActivitiesJSON += ']}';
+  console.log("json:", strActivitiesJSON);
+  return strActivitiesJSON;
+}
